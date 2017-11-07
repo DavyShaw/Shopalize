@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.jakek.ubicomp.HomeActivity"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true"
+    android:weightSum="3.4"
+    android:orientation="vertical">
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight=".1"/>
+
+    <ImageButton
+        android:id="@+id/ReceiptPicture"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center"
+        android:background="@null"
+        android:clickable="true"
+        android:onClick="clickNew"
+        android:src="@drawable/receipts"
+        android:text="@string/title_activity_receipt_history" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight=".1"/>
+
+    <ImageButton
+        android:id="@+id/ShoppingListPicture"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+
+        android:src="@drawable/shoppinglist"
+        android:text="@string/title_activity_receipt_history"
+        android:clickable="true"
+        android:onClick="clickNew"
+        android:background="@null"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight=".1"/>
+
+    <ImageButton
+        android:id="@+id/statsPicture"
+        android:src="@drawable/stats"
+        android:text="@string/title_activity_receipt_history"
+        android:clickable="true"
+        android:onClick="clickNew"
+        android:background="@null"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"/>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight=".1"/>
+    </LinearLayout>
