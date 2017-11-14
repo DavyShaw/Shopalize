@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -26,13 +27,18 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
-public class ReceiptHistory extends AppCompatActivity {
+public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     String mCurrentPhotoPath;
+    ArrayList<String> shopNames;
+    List<ShopEntry> shops;
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -95,15 +101,46 @@ public class ReceiptHistory extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        ArrayList<String> al = new ArrayList<>();
-        al.add("hi");
-        al.add("hell");
-        al.add("there");
-        al.add("you");
+
+        DBHandler db = new DBHandler(this);
+
+//        List<ShopEntry> empty = db.getAllShops();
+//        for (ShopEntry shop: empty)
+//            db.deleteShop(shop);
+//
+////        Log.d("Insert: ", "Inserting ..");
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Socks", 3));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Milk", 1.2));
+//        db.addShop(new ShopEntry("Tesco", "Ballybrack", "Milk", 4));
+//        db.addShop(new ShopEntry("Lidl", "Deansgrane", "Ham", 5));
+//        db.addShop(new ShopEntry("Aldi", "Sandyford", "Chairs", 23));
+
+        shops = db.getAllUniqueShops();
+        Set<ShopEntry> uniqueShops = new LinkedHashSet<>(shops);
+        shops = new ArrayList<>(uniqueShops);
+
+        shopNames = new ArrayList<>();
+        for (ShopEntry shop: shops)
+            shopNames.add(shop.getName()+"\t" + shop.getAddress()+shop.getDate());
+
+//                    +shop.getItemName()+shop.getItemPrice());
+
         ListView lv = (ListView)findViewById(R.id.list_receipts);
-        ArrayAdapter<String> myarrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, al);
-        lv.setAdapter(myarrayAdapter);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, shopNames);
+        lv.setOnItemClickListener(this);
+        lv.setAdapter(arrayAdapter);
         lv.setTextFilterEnabled(true);
+
 
     }
 
@@ -136,4 +173,15 @@ public class ReceiptHistory extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+        Intent intent = new Intent(this, ListItemActivity.class);
+        intent.putExtra("shop_name", shops.get((int)l).getName());
+        intent.putExtra("shop_address", shops.get((int)l).getAddress());
+        intent.putExtra("date", shops.get((int)l).getDate());
+
+//        intent.putExtra("shop_name", shopNames.get((int)l));
+        startActivity(intent);
+    }
 }
