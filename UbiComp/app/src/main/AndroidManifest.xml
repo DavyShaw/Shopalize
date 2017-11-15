@@ -3,12 +3,13 @@
     package="com.example.jakek.ubicomp">
 
     <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+
 
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -33,25 +34,24 @@
             android:label="@string/title_activity_receipt_history"
             android:parentActivityName=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ShoppingList"
-            android:label="@string/title_activity_shopping_list"
-            android:parentActivityName=".HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ShoppingList"></activity>
         <activity
             android:name=".ListItemActivity"
             android:label="@string/title_activity_list_item"
             android:parentActivityName=".ReceiptHistory"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <!-- <provider -->
-        <!-- android:name="android.support.v4.content.FileProvider" -->
-        <!-- android:authorities="com.example.android.fileprovider" -->
-        <!-- android:exported="false" -->
-        <!-- android:grantUriPermissions="true"> -->
-        <!-- <meta-data -->
-        <!-- android:name="android.support.FILE_PROVIDER_PATHS" -->
-        <!-- android:resource=""/> -->
-        <!-- </provider> -->
+
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
 
     </application>
 

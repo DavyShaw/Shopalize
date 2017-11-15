@@ -21,6 +21,11 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "shopsInfo1";
     // Contacts table name
     private static final String TABLE_SHOPS = "shops";
+
+    // Shopping List Item Table and Column
+    private static final String DATABASE_SHOPPING_LIST = "ShoppingListTable";
+    private static final String DATABASE_SHOPPING_LIST_COLUMN = "ShoppingListItems";
+
     // Shops Table Columns names
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
@@ -32,21 +37,35 @@ public class DBHandler extends SQLiteOpenHelper {
     public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
+    // ---------------------------------------------------------------------------------------------
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_SHOPS + "("
-        + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_NAME + " TEXT,"
-        + KEY_SH_ADDR + " TEXT," + KEY_DATE + " TEXT," + KEY_ITEM + " TEXT,"
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_NAME + " TEXT,"
+                + KEY_SH_ADDR + " TEXT," + KEY_DATE + " TEXT," + KEY_ITEM + " TEXT,"
                 + KEY_PRICE + " DOUBLE" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
+
+
+        // create table for shopping list
+        db.execSQL("CREATE TABLE " + DATABASE_SHOPPING_LIST + "( ID INTEGER PRIMARY KEY AUTOINCREMENT, " + "ShoppingListItems TEXT);");
+
     }
+
+    // ---------------------------------------------------------------------------------------------
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SHOPS);
+        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_SHOPPING_LIST);
 // Creating tables again
         onCreate(db);
     }
+
+    // ---------------------------------------------------------------------------------------------
 
     public void addShop(ShopEntry shop) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -60,6 +79,8 @@ public class DBHandler extends SQLiteOpenHelper {
         db.insert(TABLE_SHOPS, null, values);
         db.close(); // Closing database connection
     }
+
+    // ---------------------------------------------------------------------------------------------
 
     public List<ShopEntry> getAllShops() {
         List<ShopEntry> shopList = new ArrayList<ShopEntry>();
@@ -85,6 +106,8 @@ public class DBHandler extends SQLiteOpenHelper {
         return shopList;
     }
 
+    // ---------------------------------------------------------------------------------------------
+
     public List<ShopEntry> getAllUniqueShops() {
         List<ShopEntry> shopList = new ArrayList<>();
         String selectQuery = "SELECT DISTINCT name, shop_address, date FROM " + TABLE_SHOPS;
@@ -105,10 +128,12 @@ public class DBHandler extends SQLiteOpenHelper {
         return shopList;
     }
 
+    // ---------------------------------------------------------------------------------------------
+
     public List<ShopEntry> getItemsFromShop(String name, String address, String date) {
         List<ShopEntry> shopList = new ArrayList<>();
         String selectQuery = "SELECT item_name, item_price FROM " + TABLE_SHOPS
-                + " WHERE name = '" + name + "' AND shop_address = '" +address+ "' AND date = '" + date + "'";
+                + " WHERE name = '" + name + "' AND shop_address = '" + address + "' AND date = '" + date + "'";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 // looping through all rows and adding to list
@@ -124,6 +149,9 @@ public class DBHandler extends SQLiteOpenHelper {
 // return contact list
         return shopList;
     }
+
+    // ---------------------------------------------------------------------------------------------
+
     public int getShopsCount() {
         String countQuery = "SELECT * FROM " + TABLE_SHOPS;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -132,6 +160,8 @@ public class DBHandler extends SQLiteOpenHelper {
 // return count
         return cursor.getCount();
     }
+
+    // ---------------------------------------------------------------------------------------------
 
     public int updateShop(ShopEntry shop) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -146,12 +176,64 @@ public class DBHandler extends SQLiteOpenHelper {
                 new String[]{String.valueOf(shop.getId())});
     }
 
+    // ---------------------------------------------------------------------------------------------
+
     // Deleting a shop
     public void deleteShop(ShopEntry shop) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_SHOPS, KEY_ID + " = ?",
-                new String[] { String.valueOf(shop.getId()) });
+                new String[]{String.valueOf(shop.getId())});
         db.close();
     }
 
+    // ---------------------------------------------------------------------------------------------
+
+    // add shopping list items to the database
+    public void addShoppingItem(String shoppingItem) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(DATABASE_SHOPPING_LIST_COLUMN, shoppingItem);
+
+        sqLiteDatabase.insert(DATABASE_SHOPPING_LIST, null, contentValues);
+
+        sqLiteDatabase.close();
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    // delete shopping list item from database
+    public void deleteShoppingItem(String shoppingItem) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        sqLiteDatabase.delete(DATABASE_SHOPPING_LIST, "ShoppingListItems = ?", new String[]{shoppingItem});
+
+        sqLiteDatabase.close();
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    // populate the shopping items list using an ArrayList
+    public ArrayList<String> populateShoppingItemList() {
+        ArrayList<String> shoppingListItems = new ArrayList<>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query(DATABASE_SHOPPING_LIST, new String[]{DATABASE_SHOPPING_LIST_COLUMN}, null, null, null, null, null);
+
+        int index = cursor.getColumnIndex(DATABASE_SHOPPING_LIST_COLUMN);
+
+        while (cursor.moveToNext()) {
+            shoppingListItems.add(cursor.getString(index));
+        }
+        cursor.close();
+
+        sqLiteDatabase.close();
+
+        return shoppingListItems;
+    }
+
+    // ---------------------------------------------------------------------------------------------
 }

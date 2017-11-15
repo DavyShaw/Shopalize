@@ -1,8 +1,21 @@
 <resources>
-    <string name="app_name">UbiComp</string>
+    <string name="app_name">Shopalize</string>
     <string name="title_activity_receipt_history">Receipt History</string>
     <string name="home_page">Shopalize</string>
     <string name="title_activity_shopping_list">Shopping List</string>
     <string name="title_activity_list_item">ListItemActivity</string>
+
+
+
+    <string name="image_details_header">Details:</string>
+    <string name="image_preview_header">Preview:</string>
+    <string name="loading_message">Uploading image. Please wait.</string>
+
+    <string name="dialog_select_prompt">Choose camera or text input</string>
+    <string name="dialog_select_camera">Camera</string>
+    <string name="dialog_select_text">Text Input</string>
+
+    <string name="image_picker_error">Something is wrong with that image. Pick a different one please.</string>
+    <string name="remove_item">-</string>
 
 </resources>
