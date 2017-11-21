@@ -25,6 +25,10 @@ public class HomeActivity extends AppCompatActivity {
                 break;
             case R.id.ShoppingListPicture:
                 startActivity(new Intent(this, ShoppingList.class));
+                break;
+            case R.id.statsPicture:
+                startActivity(new Intent(this, StatsActivity.class));
+
         }
     }
 

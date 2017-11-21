@@ -9,7 +9,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.List;
 public class DBHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
     // Database Name
     private static final String DATABASE_NAME = "shopsInfo1";
     // Contacts table name
@@ -237,5 +236,35 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     // ---------------------------------------------------------------------------------------------
+    public int spendByMonth(String date) {
+        String selectQuery = "SELECT item_price FROM " + TABLE_SHOPS
+                + " WHERE date LIKE '%" + date + "'";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        int total = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                total += cursor.getInt(0);
+            } while (cursor.moveToNext());
+        }
+        return total;
+    }
+
+    public ArrayList<String> popularity(){
+        String selectQuery = "SELECT item_name, COUNT(item_name) FROM " + TABLE_SHOPS
+                + " GROUP by item_name ORDER BY COUNT(item_name) DESC";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        ArrayList<String> values = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                values.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+        return values;
+    }
 
 }

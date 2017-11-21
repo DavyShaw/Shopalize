@@ -51,7 +51,11 @@
         <meta-data
         android:name="com.google.android.gms.vision.DEPENDENCIES"
         android:value="ocr"/>
-
+        <activity
+            android:name=".StatsActivity"
+            android:label="StatsActivity"
+            android:parentActivityName=".HomeActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
     </application>
 

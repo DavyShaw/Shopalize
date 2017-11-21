@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -73,6 +74,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         setContentView(R.layout.activity_receipt_history);
 
         scanResults = (TextView) findViewById(R.id.results);
+        scanResults.setMovementMethod(new ScrollingMovementMethod());
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

@@ -125,6 +125,13 @@ public class ShoppingList extends AppCompatActivity {
 //                populateShoppingList();
 //            }
 //        });
+        Button suggest = (Button) findViewById(R.id.suggestion);
+        ArrayList<String> values = DBHandler.popularity();
+        for (String value: values){
+            Toast.makeText(this, value, Toast.LENGTH_LONG);
+            Log.i("OVERHERE", value);
+        }
+        suggest.setText("Cheese");
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -150,7 +157,6 @@ public class ShoppingList extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .create();
         dialog.show();
-        ;
     }
 
     // ---------------------------------------------------------------------------------------------
