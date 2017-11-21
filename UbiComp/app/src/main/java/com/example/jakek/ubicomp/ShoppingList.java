@@ -2,9 +2,11 @@ package com.example.jakek.ubicomp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +73,7 @@ public class ShoppingList extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
         getSupportActionBar().setTitle("Shopping List");
@@ -127,7 +131,26 @@ public class ShoppingList extends AppCompatActivity {
 
     // method to launch the text entry method to add items to the list
     public void startTextEntry() {
-
+        final EditText itemEdit = new EditText(ShoppingList.this);
+        android.support.v7.app.AlertDialog dialog = new android.support.v7.app.AlertDialog.Builder(ShoppingList.this)
+                .setTitle("Add an Item to the list")
+                .setView(itemEdit)
+                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String item = String.valueOf(itemEdit.getText());
+                        SQLiteDatabase db = DBHandler.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        values.put(DBHandler.DATABASE_SHOPPING_LIST_COLUMN, item);
+                        db.insertWithOnConflict(DBHandler.DATABASE_SHOPPING_LIST, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                        db.close();
+                        populateShoppingList();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
+        ;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -370,11 +393,13 @@ public class ShoppingList extends AppCompatActivity {
     // ---------------------------------------------------------------------------------------------
 
 
-    private void deleteShoppingItem(View v){
+    public void deleteShoppingItem(View v){
         View parent = (View) v.getParent();
         TextView shoppingItemTextView = parent.findViewById(R.id.shopping_list_item);
         String shoppingItem = String.valueOf(shoppingItemTextView.getText());
-        DBHandler.deleteShoppingItem(shoppingItem);
+        SQLiteDatabase db = DBHandler.getWritableDatabase();
+        db.delete(DBHandler.DATABASE_SHOPPING_LIST, DBHandler.DATABASE_SHOPPING_LIST_COLUMN + " = ?",
+                new String[]{shoppingItem});
         populateShoppingList();
     }
 

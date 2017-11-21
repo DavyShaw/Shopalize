@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,8 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String TABLE_SHOPS = "shops";
 
     // Shopping List Item Table and Column
-    private static final String DATABASE_SHOPPING_LIST = "ShoppingListTable";
-    private static final String DATABASE_SHOPPING_LIST_COLUMN = "ShoppingListItems";
+    public static final String DATABASE_SHOPPING_LIST = "ShoppingListTable";
+    public static final String DATABASE_SHOPPING_LIST_COLUMN = "ShoppingListItems";
 
     // Shops Table Columns names
     private static final String KEY_ID = "id";
@@ -236,4 +237,5 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     // ---------------------------------------------------------------------------------------------
+
 }
