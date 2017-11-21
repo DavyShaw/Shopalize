@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/UbiComp.iml" filepath="$PROJECT_DIR$/UbiComp.iml" />
-      <module fileurl="file://C:\Users\Davy\Documents\GitHub\shopalize\UbiComp\UbiComp.iml" filepath="C:\Users\Davy\Documents\GitHub\shopalize\UbiComp\UbiComp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\Davy\Documents\GitHub\shopalize\UbiComp\app\app.iml" filepath="C:\Users\Davy\Documents\GitHub\shopalize\UbiComp\app\app.iml" />
     </modules>
   </component>
 </project>
