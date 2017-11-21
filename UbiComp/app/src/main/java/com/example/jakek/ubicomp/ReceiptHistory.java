@@ -310,8 +310,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                         // select the top rated label feature
                         annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
                             Feature textDetection = new Feature();
-                            textDetection.setType("TEXT_DETECTION");
-//                            textDetection.setMaxResults(1);
+                            textDetection.setType("DOCUMENT_TEXT_DETECTION");
                             add(textDetection);
                         }});
 
