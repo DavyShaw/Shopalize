@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.jjoe64.graphview.GraphView;
@@ -33,10 +35,14 @@ public class StatsActivity extends AppCompatActivity {
 
     }
 
-    protected void onStart() {
-        super.onStart();
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_bar, menu);
+        return true;
     }
 
+    // ---------------------------------------------------------------------------------------------
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -52,7 +58,14 @@ public class StatsActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+
     }
+
+
+    protected void onStart() {
+        super.onStart();
+    }
+
 
     public void showGraph(){
         GraphView graph = (GraphView) findViewById(R.id.graph);

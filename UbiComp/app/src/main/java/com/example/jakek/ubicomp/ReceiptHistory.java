@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -84,29 +85,31 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 startCamera();
             }
         });
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
 
 
         DBHandler db = new DBHandler(this);
 
-//        List<ShopEntry> empty = db.getAllShops();
-//        for (ShopEntry shop: empty)
-//            db.deleteShop(shop);
-//
-////        Log.d("Insert: ", "Inserting ..");
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Socks", 3));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Milk", 1.2));
-//        db.addShop(new ShopEntry("Tesco", "Ballybrack", "Milk", 4));
-//        db.addShop(new ShopEntry("Lidl", "Deansgrane", "Ham", 5));
-//        db.addShop(new ShopEntry("Aldi", "Sandyford", "Chairs", 23));
+        List<ShopEntry> empty = db.getAllShops();
+        for (ShopEntry shop: empty)
+            db.deleteShop(shop);
+
+//        Log.d("Insert: ", "Inserting ..");
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Socks", 3));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Milk", 1.2));
+        db.addShop(new ShopEntry("Tesco", "Ballybrack", "Milk", 4));
+        db.addShop(new ShopEntry("Lidl", "Deansgrane", "Ham", 5));
+        db.addShop(new ShopEntry("Aldi", "Sandyford", "Chairs", 23));
 
         shops = db.getAllUniqueShops();
         Set<ShopEntry> uniqueShops = new LinkedHashSet<>(shops);
@@ -146,6 +149,9 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 return true;
             case R.id.ShoppingList:
                 startActivity(new Intent(this, ShoppingList.class));
+                return true;
+            case R.id.StatsPage:
+                startActivity(new Intent(this, StatsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

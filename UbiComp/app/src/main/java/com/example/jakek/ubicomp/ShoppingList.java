@@ -16,8 +16,12 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -50,6 +54,7 @@ import java.util.Locale;
 
 public class ShoppingList extends AppCompatActivity {
 
+    ArrayList<String> shoppingItemList;
     private static final String CLOUD_VISION_API_KEY = "AIzaSyDsXD1sQ3digY49e9bBzf2Z_B_1aRd-AhQ";
     public static final String FILE_NAME = "shoppingListItem.jpg";
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
@@ -68,6 +73,8 @@ public class ShoppingList extends AppCompatActivity {
 
     private ArrayAdapter<String> mAdapter;
     private ListView shoppingItemListView;
+    ArrayList<String> values;
+    Button suggest;
 
     // ---------------------------------------------------------------------------------------------
 
@@ -77,6 +84,8 @@ public class ShoppingList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
         getSupportActionBar().setTitle("Shopping List");
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
 
 
         // button that prompts to use the camera or text input
@@ -125,13 +134,35 @@ public class ShoppingList extends AppCompatActivity {
 //                populateShoppingList();
 //            }
 //        });
-        Button suggest = (Button) findViewById(R.id.suggestion);
-        ArrayList<String> values = DBHandler.popularity();
-        for (String value: values){
-            Toast.makeText(this, value, Toast.LENGTH_LONG);
-            Log.i("OVERHERE", value);
+        values = DBHandler.popularity();
+        setprediction();
+
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_bar, menu);
+        return true;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.ReceiptHistory:
+                startActivity(new Intent(this, ReceiptHistory.class));
+                return true;
+            case R.id.ShoppingList:
+                startActivity(new Intent(this, ShoppingList.class));
+                return true;
+            case R.id.StatsPage:
+                startActivity(new Intent(this, StatsActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        suggest.setText("Cheese");
+
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -386,7 +417,7 @@ public class ShoppingList extends AppCompatActivity {
 
     // populate the ListView with shopping list items from the database
     private void populateShoppingList(){
-        ArrayList<String> shoppingItemList = DBHandler.populateShoppingItemList();
+        shoppingItemList = DBHandler.populateShoppingItemList();
         if(mAdapter == null){
             mAdapter = new ArrayAdapter<String>(this, R.layout.shopping_list_row, R.id.shopping_list_item, shoppingItemList);
             shoppingItemListView.setAdapter(mAdapter);
@@ -407,6 +438,47 @@ public class ShoppingList extends AppCompatActivity {
         db.delete(DBHandler.DATABASE_SHOPPING_LIST, DBHandler.DATABASE_SHOPPING_LIST_COLUMN + " = ?",
                 new String[]{shoppingItem});
         populateShoppingList();
+    }
+
+    public void setprediction(){
+        Button suggest = (Button) findViewById(R.id.suggestion);
+        Button removeSuggest = (Button) findViewById(R.id.removeSuggestion);
+        String prediction = "";
+        int i = 0;
+        Log.i("SIZE", values.size()+"");
+        while (prediction == ""){
+            if (i == values.size()) {
+                suggest.setVisibility(View.GONE);
+                removeSuggest.setVisibility(View.GONE);
+                break;
+            }
+            else if (shoppingItemList.contains(values.get(i)))
+                i++;
+            else
+                prediction = values.get(i);
+        }
+
+//        for (String value: values){
+//            Log.i("OVERHERE", value);
+//        }
+        suggest.setText(prediction);
+    }
+
+    public void addPrediction(View view){
+        Log.i("Clicked", "YUP");
+        suggest = (Button) findViewById(R.id.suggestion);
+        String message = (String) suggest.getText();
+        DBHandler.addShoppingItem(message);
+        mAdapter.add(message);
+        mAdapter.notifyDataSetChanged();
+        setprediction();
+    }
+
+    public void removePrediction(View view){
+        suggest = (Button) findViewById(R.id.suggestion);
+        String message = (String) suggest.getText();
+        values.remove(message);
+        setprediction();
     }
 
 }
