@@ -3,7 +3,6 @@ package com.example.jakek.ubicomp;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -45,7 +44,9 @@ import com.google.api.services.vision.v1.model.Image;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -70,8 +71,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
     ArrayList<String> shopNames;
     List<ShopEntry> shops;
 
-
-    private String realPath;
+    private String absolutePath;
 
 
     @Override
@@ -87,7 +87,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startCamera();
+                    startCamera();
             }
         });
         ActionBar ab = getSupportActionBar();
@@ -186,16 +186,14 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 this,
                 CAMERA_PERMISSIONS_REQUEST,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA)) {
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // request launch of camera
+                    Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile()); // get the uri of the image
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri); // assign the image to the uri, as an image cannot be retrieved from the getExtra() method
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // the camera will be allowed to read the uri in the data sent with the intent
+                    startActivityForResult(intent, CAMERA_IMAGE_REQUEST); // open the activity and pass the result parameter
 
-
-
-
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // request launch of camera
-            Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile()); // get the uri of the image
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri); // assign the image to the uri, as an image cannot be retrieved from the getExtra() method
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // the camera will be allowed to read the uri in the data sent with the intent
-            startActivityForResult(intent, CAMERA_IMAGE_REQUEST); // open the activity and pass the result parameter
 
         }
 
@@ -222,10 +220,13 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             // gets the uri of the photo
             Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile());
 
+            try {
+                createImageFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-
-//            saveImage(imageUri);
-//            saveImage(context, photoUri, null);
+            addPhotoToGallery();
             uploadImage(photoUri);
         }
     }
@@ -241,7 +242,8 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
         if (requestCode == CAMERA_PERMISSIONS_REQUEST) {
             if (PermissionUtils.permissionGranted(requestCode, CAMERA_PERMISSIONS_REQUEST, grantResults)) {
-                startCamera();
+                    startCamera();
+
             }
 
         }
@@ -258,6 +260,8 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 Bitmap bitmap = scaleBitmapDown(
                         MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
                         1200);
+
+                MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null , null);
 
 
                 // pass the bitmap image to the cloud vision api function
@@ -404,12 +408,12 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             }
 
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-//                    scanResults.setText(message);
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                   scanResults.setText(message);
+//                }
+//            });
 
 //            System.out.println(message);
             extractItemsFromReceipt(message); // adds each indivual word to a new row in table
@@ -437,7 +441,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         DBHandler db = new DBHandler(this);
 
 
-        db.addReceiptData(new ShoppingReceiptData(receiptOutput, realPath));
+        db.addReceiptData(new ShoppingReceiptData(receiptOutput, absolutePath));
 
         db.close();
 
@@ -460,37 +464,27 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
     // ---------------------------------------------------------------------------------------------
 
-    private void getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (cursor == null) {
-            contentUri.getPath();
-        }
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        realPath =  cursor.getString(column_index);
+    private void addPhotoToGallery() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(absolutePath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
-//    public void saveImage(Context context, Uri uri, String imageName) {
-//        Bitmap b = null;
-//        try {
-//            b = scaleBitmapDown(
-//                            MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
-//                            1200);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        FileOutputStream foStream;
-//        try {
-//            foStream = context.openFileOutput(imageName, Context.MODE_PRIVATE);
-//            b.compress(Bitmap.CompressFormat.PNG, 100, foStream);
-//            foStream.close();
-//
-//            System.out.println("Directory is: " + ReceiptHistory.this.getFilesDir().getAbsolutePath());
-//        } catch (Exception e) {
-//            Log.d("saveImage", "Exception 2, Something went wrong!");
-//            e.printStackTrace();
-//        }
-//    }
+    // ---------------------------------------------------------------------------------------------
+
+    private void createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        absolutePath = image.getAbsolutePath();
+    }
 }

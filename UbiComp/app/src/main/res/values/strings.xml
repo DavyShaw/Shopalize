@@ -18,4 +18,6 @@
     <string name="image_picker_error">Something is wrong with that image. Pick a different one please.</string>
     <string name="remove_item">-</string>
 
+    <string name="album_name">Shopalize</string>
+
 </resources>
