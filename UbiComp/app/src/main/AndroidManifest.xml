@@ -7,10 +7,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
-
-
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
@@ -29,14 +29,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ReceiptHistory"/>
-        <activity android:name=".ShoppingList"></activity>
+        <activity android:name=".ReceiptHistory" />
+        <activity android:name=".ShoppingList" />
         <activity
             android:name=".ListItemActivity"
             android:label="@string/title_activity_list_item"
             android:parentActivityName=".ReceiptHistory"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -45,18 +44,22 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
         <meta-data
-        android:name="com.google.android.gms.vision.DEPENDENCIES"
-        android:value="ocr"/>
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="ocr" />
+
         <activity
             android:name=".StatsActivity"
             android:label="StatsActivity"
             android:parentActivityName=".HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".FullImageActivity"
+            android:label="@string/title_activity_full_image"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

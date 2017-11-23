@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private boolean zoomOut =  false;
 
     private static final String CLOUD_VISION_API_KEY = "AIzaSyDsXD1sQ3digY49e9bBzf2Z_B_1aRd-AhQ";
     public static final String FILE_NAME = "shoppingListItem.jpg";
@@ -130,13 +131,37 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 //        lv.setAdapter(arrayAdapter);
 //        lv.setTextFilterEnabled(true);
 
-        GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
+        GridView gridView = (GridView) findViewById(R.id.gridview);
+        gridView.setAdapter(new ImageAdapter(this));
 
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            public void onItemClick(AdapterView<?> parent, View v,
+//                                    int position, long id) {
+////                Toast.makeText(ReceiptHistory.this, "" + position, Toast.LENGTH_SHORT).show();
+//                if(zoomOut) {
+//                    Toast.makeText(getApplicationContext(), "NORMAL SIZE!", Toast.LENGTH_LONG).show();
+//                        v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+//                    v.setAdjustViewBounds(true);
+//                    zoomOut =false;
+//                }else{
+//                    Toast.makeText(getApplicationContext(), "FULLSCREEN!", Toast.LENGTH_LONG).show();
+//                    imageView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+//                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+//                    zoomOut = true;
+//                }
+//            }
+//        }
+//        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(ReceiptHistory.this, "" + position, Toast.LENGTH_SHORT).show();
+
+                // Sending image id to FullScreenActivity
+                Intent i = new Intent(getApplicationContext(), FullImageActivity.class);
+                // passing array index
+                i.putExtra("id", position);
+                startActivity(i);
             }
         });
     }
