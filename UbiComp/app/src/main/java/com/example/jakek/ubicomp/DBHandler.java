@@ -34,6 +34,16 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_ITEM = "item_name";
     private static final String KEY_PRICE = "item_price";
 
+
+    // Receipt Data for Searching. One string per receipt.
+    private static final String TABLE_RECEIPT_DATA_SEARCH = "receiptDataTable";
+    private static final String KEY_PHOTO_DIRECTORY = "photoDirectory";
+    private static final String KEY_RECEIPT_DATA = "receiptData";
+
+
+    // Receipt data for predictions.
+    private static final String TABLE_RECEIPT_DATA_ITEMS = "receiptDataTableWithIndividualItems";
+
     public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -49,6 +59,23 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CONTACTS_TABLE);
 
 
+
+        String CREATE_RECEIPT_DATA_TABLE = "CREATE TABLE " + TABLE_RECEIPT_DATA_SEARCH + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_DATE + " TEXT," +
+                KEY_RECEIPT_DATA + " TEXT," + KEY_PHOTO_DIRECTORY + " TEXT)";
+
+        db.execSQL(CREATE_RECEIPT_DATA_TABLE);
+
+
+        String CREATE_INDIVIDUAL_RECEIPT_ITEM_TABLE = "CREATE TABLE " + TABLE_RECEIPT_DATA_ITEMS +
+                "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_DATE + " TEXT," +
+                KEY_ITEM + " TEXT)";
+
+        db.execSQL(CREATE_INDIVIDUAL_RECEIPT_ITEM_TABLE);
+
+
+
+
         // create table for shopping list
         db.execSQL("CREATE TABLE " + DATABASE_SHOPPING_LIST + "( ID INTEGER PRIMARY KEY AUTOINCREMENT, " + "ShoppingListItems TEXT);");
 
@@ -61,6 +88,8 @@ public class DBHandler extends SQLiteOpenHelper {
 // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SHOPS);
         db.execSQL("DROP TABLE IF EXISTS " + DATABASE_SHOPPING_LIST);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECEIPT_DATA_SEARCH);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECEIPT_DATA_ITEMS);
 // Creating tables again
         onCreate(db);
     }
@@ -265,6 +294,38 @@ public class DBHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         return values;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    public void addReceiptData(ShoppingReceiptData shoppingReceiptData){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_DATE, shoppingReceiptData.getDate());
+        values.put(KEY_RECEIPT_DATA, shoppingReceiptData.getReceiptData());
+        values.put(KEY_PHOTO_DIRECTORY, shoppingReceiptData.getAbsolutePath());
+
+
+        db.insert(TABLE_RECEIPT_DATA_SEARCH, null, values);
+        db.close();
+
+
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    public void addItemsFromReceipt(ShoppingListItems shoppingListItems){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_ITEM, shoppingListItems.getItem());
+        values.put(KEY_DATE, shoppingListItems.getDate());
+
+        db.insert(TABLE_RECEIPT_DATA_ITEMS, null, values);
+        db.close();
+
     }
 
 }
