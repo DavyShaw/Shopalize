@@ -65,7 +65,6 @@
         android:padding="5dp"
         android:onClick="removePrediction"
         android:drawableRight="@drawable/dismissbutton"
-
         />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

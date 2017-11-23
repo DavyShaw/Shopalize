@@ -21,8 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,10 +46,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -96,44 +93,52 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
         DBHandler db = new DBHandler(this);
 
-        List<ShopEntry> empty = db.getAllShops();
-        for (ShopEntry shop : empty)
-            db.deleteShop(shop);
+//        List<ShopEntry> empty = db.getAllShops();
+//        for (ShopEntry shop : empty)
+//            db.deleteShop(shop);
+//
+////        Log.d("Insert: ", "Inserting ..");
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Socks", 3));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
+//        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Milk", 1.2));
+//        db.addShop(new ShopEntry("Tesco", "Ballybrack", "Milk", 4));
+//        db.addShop(new ShopEntry("Lidl", "Deansgrane", "Ham", 5));
+//        db.addShop(new ShopEntry("Aldi", "Sandyford", "Chairs", 23));
+//
+//        shops = db.getAllUniqueShops();
+//        Set<ShopEntry> uniqueShops = new LinkedHashSet<>(shops);
+//        shops = new ArrayList<>(uniqueShops);
+//
+//        shopNames = new ArrayList<>();
+//        for (ShopEntry shop : shops)
+//            shopNames.add(shop.getName() + "\t" + shop.getAddress() + shop.getDate());
+//
+////                    +shop.getItemName()+shop.getItemPrice());
+//
+//        ListView lv = (ListView) findViewById(R.id.list_receipts);
+//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
+//                android.R.layout.simple_list_item_1, shopNames);
+//        lv.setOnItemClickListener(this);
+//        lv.setAdapter(arrayAdapter);
+//        lv.setTextFilterEnabled(true);
 
-//        Log.d("Insert: ", "Inserting ..");
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Socks", 3));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Cheese", 1.5));
-        db.addShop(new ShopEntry("Dunnes", " Cabinteely", "Milk", 1.2));
-        db.addShop(new ShopEntry("Tesco", "Ballybrack", "Milk", 4));
-        db.addShop(new ShopEntry("Lidl", "Deansgrane", "Ham", 5));
-        db.addShop(new ShopEntry("Aldi", "Sandyford", "Chairs", 23));
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        gridview.setAdapter(new ImageAdapter(this));
 
-        shops = db.getAllUniqueShops();
-        Set<ShopEntry> uniqueShops = new LinkedHashSet<>(shops);
-        shops = new ArrayList<>(uniqueShops);
-
-        shopNames = new ArrayList<>();
-        for (ShopEntry shop : shops)
-            shopNames.add(shop.getName() + "\t" + shop.getAddress() + shop.getDate());
-
-//                    +shop.getItemName()+shop.getItemPrice());
-
-        ListView lv = (ListView) findViewById(R.id.list_receipts);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, shopNames);
-        lv.setOnItemClickListener(this);
-        lv.setAdapter(arrayAdapter);
-        lv.setTextFilterEnabled(true);
-
-
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Toast.makeText(ReceiptHistory.this, "" + position, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // ---------------------------------------------------------------------------------------------
