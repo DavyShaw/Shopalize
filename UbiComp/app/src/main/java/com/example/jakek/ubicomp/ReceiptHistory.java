@@ -3,6 +3,7 @@ package com.example.jakek.ubicomp;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -64,9 +65,13 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
     private TextView scanResults;
     private String message = "";
+    private String lastWord = "";
 
     ArrayList<String> shopNames;
     List<ShopEntry> shops;
+
+
+    private String realPath;
 
 
     @Override
@@ -92,7 +97,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         DBHandler db = new DBHandler(this);
 
         List<ShopEntry> empty = db.getAllShops();
-        for (ShopEntry shop: empty)
+        for (ShopEntry shop : empty)
             db.deleteShop(shop);
 
 //        Log.d("Insert: ", "Inserting ..");
@@ -116,12 +121,12 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         shops = new ArrayList<>(uniqueShops);
 
         shopNames = new ArrayList<>();
-        for (ShopEntry shop: shops)
-            shopNames.add(shop.getName()+"\t" + shop.getAddress()+shop.getDate());
+        for (ShopEntry shop : shops)
+            shopNames.add(shop.getName() + "\t" + shop.getAddress() + shop.getDate());
 
 //                    +shop.getItemName()+shop.getItemPrice());
 
-        ListView lv = (ListView)findViewById(R.id.list_receipts);
+        ListView lv = (ListView) findViewById(R.id.list_receipts);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, shopNames);
         lv.setOnItemClickListener(this);
@@ -165,9 +170,9 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
         Intent intent = new Intent(this, ListItemActivity.class);
-        intent.putExtra("shop_name", shops.get((int)l).getName());
-        intent.putExtra("shop_address", shops.get((int)l).getAddress());
-        intent.putExtra("date", shops.get((int)l).getDate());
+        intent.putExtra("shop_name", shops.get((int) l).getName());
+        intent.putExtra("shop_address", shops.get((int) l).getAddress());
+        intent.putExtra("date", shops.get((int) l).getDate());
 
 //        intent.putExtra("shop_name", shopNames.get((int)l));
         startActivity(intent);
@@ -182,6 +187,10 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 CAMERA_PERMISSIONS_REQUEST,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA)) {
+
+
+
+
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // request launch of camera
             Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile()); // get the uri of the image
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri); // assign the image to the uri, as an image cannot be retrieved from the getExtra() method
@@ -212,6 +221,11 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         if (requestCode == CAMERA_IMAGE_REQUEST && resultCode == RESULT_OK) {
             // gets the uri of the photo
             Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile());
+
+
+
+//            saveImage(imageUri);
+//            saveImage(context, photoUri, null);
             uploadImage(photoUri);
         }
     }
@@ -225,7 +239,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 
-        if (requestCode == CAMERA_PERMISSIONS_REQUEST){
+        if (requestCode == CAMERA_PERMISSIONS_REQUEST) {
             if (PermissionUtils.permissionGranted(requestCode, CAMERA_PERMISSIONS_REQUEST, grantResults)) {
                 startCamera();
             }
@@ -239,10 +253,12 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
     public void uploadImage(Uri uri) {
         if (uri != null) {
             try {
+//                getRealPathFromURI(uri);
                 // scale the image to save on bandwidth
                 Bitmap bitmap = scaleBitmapDown(
                         MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
                         1200);
+
 
                 // pass the bitmap image to the cloud vision api function
                 callCloudVision(bitmap);
@@ -261,6 +277,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
     private void callCloudVision(final Bitmap bitmap) throws IOException {
         // Update the temporary textview to inform users that the photo is uploading
+
 
         Context context = getApplicationContext();
         Toast.makeText(context, R.string.loading_message, Toast.LENGTH_LONG).show();
@@ -384,18 +401,24 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             for (EntityAnnotation label : labels) {
                 message += String.format(Locale.ENGLISH, "%s", label.getDescription());
 
-
-                runOnUiThread(new Runnable(){
-                    @Override
-                    public void run() {
-                        scanResults.setText(message);
-                    }
-                });
-
-
             }
+
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    scanResults.setText(message);
+                }
+            });
+
+//            System.out.println(message);
+            extractItemsFromReceipt(message); // adds each indivual word to a new row in table
+
+            lastWord = message.substring(message.lastIndexOf(" ") + 1); // gets the final string i.e. the items in one single string
+            extractOneStringFromReceipt(lastWord); // adds the entire single string to the db
+
         } else {
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Context context = getApplicationContext();
@@ -404,6 +427,70 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             });
         }
 
+        Log.d("Output", message);
         return message;
     }
+
+    // ---------------------------------------------------------------------------------------------
+
+    private void extractOneStringFromReceipt(String receiptOutput) {
+        DBHandler db = new DBHandler(this);
+
+
+        db.addReceiptData(new ShoppingReceiptData(receiptOutput, realPath));
+
+        db.close();
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    private void extractItemsFromReceipt(String receiptOutput) {
+        String items[] = receiptOutput.split("\\r?\\n");
+
+        DBHandler db = new DBHandler(this);
+
+        for (int i = 0; i < (items.length - 1); i += 1) {
+            db.addItemsFromReceipt(new ShoppingListItems(items[i]));
+        }
+
+        db.close();
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    private void getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor == null) {
+            contentUri.getPath();
+        }
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        realPath =  cursor.getString(column_index);
+    }
+
+//    public void saveImage(Context context, Uri uri, String imageName) {
+//        Bitmap b = null;
+//        try {
+//            b = scaleBitmapDown(
+//                            MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
+//                            1200);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        FileOutputStream foStream;
+//        try {
+//            foStream = context.openFileOutput(imageName, Context.MODE_PRIVATE);
+//            b.compress(Bitmap.CompressFormat.PNG, 100, foStream);
+//            foStream.close();
+//
+//            System.out.println("Directory is: " + ReceiptHistory.this.getFilesDir().getAbsolutePath());
+//        } catch (Exception e) {
+//            Log.d("saveImage", "Exception 2, Something went wrong!");
+//            e.printStackTrace();
+//        }
+//    }
 }
