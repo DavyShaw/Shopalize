@@ -3,6 +3,7 @@ package com.example.jakek.ubicomp;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -70,6 +71,8 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
     List<ShopEntry> shops;
 
     private String absolutePath;
+
+    private Uri uriPath;
 
 
     @Override
@@ -498,6 +501,17 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(absolutePath);
         Uri contentUri = Uri.fromFile(f);
+
+
+        uriPath = contentUri;
+
+        String path = contentUri.toString();
+
+        Context context = getApplicationContext();
+//        Toast.makeText(context, path, Toast.LENGTH_LONG).show();
+
+//        getRealPathFromURI(contentUri);
+
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
     }
@@ -515,6 +529,26 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 storageDir      /* directory */
         );
 
-        absolutePath = image.getAbsolutePath();
+
+
+        absolutePath = getFilesDir().getAbsolutePath();
+
+
+        Context context = getApplicationContext();
+        Toast.makeText(context, uriPath + imageFileName, Toast.LENGTH_LONG).show();
+
     }
+
+    public void getRealPathFromURI(Uri uri) {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        String path =  cursor.getString(idx);
+
+        Context context = getApplicationContext();
+        Toast.makeText(context, path, Toast.LENGTH_LONG).show();
+    }
+
+
+
 }

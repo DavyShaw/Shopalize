@@ -1,6 +1,7 @@
 package com.example.jakek.ubicomp;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -43,12 +44,16 @@ class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageResource(mThumbIds[position]);
+        imageView.setImageDrawable(mThumbIds[position]);
         return imageView;
     }
+    Drawable d =  Drawable.createFromPath("file:///data/user/0/com.example.jakek.ubicomp/files/Pictures/JPEG/_20171123_152247_1709976594343150848.jpg");
+
+//    int d1
 
     // references to our images
-    public Integer[] mThumbIds = {
-            R.drawable.dismiss
+    public Drawable[] mThumbIds = {
+           d
     };
 }
+

@@ -56,10 +56,13 @@
             android:label="StatsActivity"
             android:parentActivityName=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".FullImageActivity"
             android:label="@string/title_activity_full_image"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".Gallery"></activity>
+
     </application>
 
 </manifest>

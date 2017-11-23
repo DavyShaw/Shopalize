@@ -21,7 +21,7 @@ public class FullImageActivity extends Activity {
         ImageAdapter imageAdapter = new ImageAdapter(this);
 
         ImageView imageView = (ImageView) findViewById(R.id.full_image_view);
-        imageView.setImageResource(imageAdapter.mThumbIds[position]);
+        imageView.setImageDrawable(imageAdapter.mThumbIds[position]);
     }
 
     public void killPic(View view) {
