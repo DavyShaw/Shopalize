@@ -51,6 +51,7 @@ public class SearchResults extends AppCompatActivity {
                 intent.putExtra("query", query);
 
                 startActivity(intent);
+                finish();
 
                 return true;
             }

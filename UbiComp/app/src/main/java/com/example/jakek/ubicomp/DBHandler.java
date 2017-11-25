@@ -17,7 +17,7 @@ import java.util.List;
 public class DBHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 11;
     // Database Name
     private static final String DATABASE_NAME = "shopsInfo1";
     // Contacts table name
@@ -369,4 +369,20 @@ public class DBHandler extends SQLiteOpenHelper {
         return values;
 
     }
+
+    public void removeEntry(String path) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_RECEIPT_DATA_SEARCH, KEY_PHOTO_DIRECTORY + " = ?", new String[]{path});
+        db.close();
+//    }
+
+    }
+
+//    public void deleteShop(ShopEntry shop) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        db.delete(TABLE_SHOPS, KEY_ID + " = ?",
+//                new String[]{String.valueOf(shop.getId())});
+//        db.close();
+//    }
+
 }

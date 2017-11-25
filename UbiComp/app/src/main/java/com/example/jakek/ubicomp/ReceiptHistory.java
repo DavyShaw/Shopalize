@@ -328,36 +328,12 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             }
 
             uploadImage(photoUri);
+
+            
 //            adapter.updateAbsPath();
 //            adapter.addItem(image);
 //            adapter.notifyDataSetChanged();
 //            gridView.setAdapter(adapter);
-            DBHandler db = new DBHandler(this);
-            try {
-                pics = db.getAllPics();
-//                Toast.makeText(this, "here again", Toast.LENGTH_LONG).show();
-                int count = 0;
-                for (ShoppingReceiptData pic: pics){
-                    count++;
-                }
-                Toast.makeText(this, count+"", Toast.LENGTH_LONG).show();
-
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-
-            }
-            absPath = new ArrayList();
-
-            for (int i=0; i<pics.size(); i++){
-                String dir = pics.get(i).getAbsolutePath();
-                File f = new File(dir);
-                Uri imageUri = Uri.fromFile(f);
-
-                absPath.add(imageUri);
-            }
-            adapter = new ImageAdapter(this, absPath);
-            gridView.setAdapter(adapter);
 
 //            Toast.makeText(this, "Should appear", Toast.LENGTH_LONG).show();
 
@@ -415,6 +391,26 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             Log.d(TAG, "Image picker returned a null image.");
             Toast.makeText(this, R.string.image_picker_error, Toast.LENGTH_LONG).show();
         }
+
+        DBHandler db = new DBHandler(this);
+        try {
+            pics = db.getAllPics();
+        } catch (ParseException e) {
+            e.printStackTrace();
+
+        }
+        absPath = new ArrayList();
+
+        for (int i=0; i<pics.size(); i++){
+            String dir = pics.get(i).getAbsolutePath();
+            File f = new File(dir);
+            Uri imageUri = Uri.fromFile(f);
+
+            absPath.add(imageUri);
+        }
+        adapter = new ImageAdapter(this, absPath);
+        gridView.setAdapter(adapter);
+
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -582,6 +578,16 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
 
         db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath()));
+
+        runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Toast.makeText(getApplicationContext(), image.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                }
+            });
+
+
 
         db.close();
 

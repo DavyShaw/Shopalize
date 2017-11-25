@@ -7,11 +7,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 public class FullImageActivity extends Activity {
-
+    String test;
+    Uri myUri;
+    URI myURI;
+    DBHandler db;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,11 +30,17 @@ public class FullImageActivity extends Activity {
         // Selected image id
 //        int position = i.getExtras().getInt("id");
 
+        db = new DBHandler(this);
         ImageView imageView = (ImageView) findViewById(R.id.full_image_view);
         Intent i = getIntent();
-        String test = i.getStringExtra("id");
+        test = i.getStringExtra("id");
         ArrayList<Uri> abs = new ArrayList<>();
-        Uri myUri = Uri.parse(test);
+        myUri = Uri.parse(test);
+        try {
+            myURI = new URI(myUri.toString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         abs.add(myUri);
         ImageAdapter imageAdapter = new ImageAdapter(this, abs);
@@ -39,5 +52,16 @@ public class FullImageActivity extends Activity {
 
     public void killPic(View view) {
         finish();
+    }
+
+    public void deletePic(View view) {
+        Toast.makeText(this, test, Toast.LENGTH_LONG).show();
+        //need to remove from db and from storage;
+        File file = new File(myURI);
+        boolean deleted = file.delete();
+        test = test.substring(7);
+        db.removeEntry(test);
+        killPic(view);
+
     }
 }
