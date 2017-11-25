@@ -10,13 +10,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 8;
     // Database Name
     private static final String DATABASE_NAME = "shopsInfo1";
     // Contacts table name
@@ -328,4 +329,44 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
+    public List<ShoppingReceiptData> getAllPics() throws ParseException {
+        List<ShoppingReceiptData> values = new ArrayList<>();
+        String selectQuery = "SELECT "+KEY_DATE+","+KEY_RECEIPT_DATA+", "+KEY_PHOTO_DIRECTORY+" FROM " + TABLE_RECEIPT_DATA_SEARCH;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+                if (cursor.moveToFirst()) {
+                    do {
+                        ShoppingReceiptData pic = new ShoppingReceiptData();
+                        pic.setDate(cursor.getString(0));
+                        pic.setReceiptData(cursor.getString(1));
+                        pic.setAbsolutePath(cursor.getString(2));
+                        values.add(pic);
+                    }while (cursor.moveToNext());
+                }
+        return values;
+    }
+
+
+    public List<ShoppingReceiptData> getSelectPics(String query) {
+        List<ShoppingReceiptData> values = new ArrayList<>();
+        String selectQuery = "SELECT "+KEY_DATE+","+KEY_RECEIPT_DATA+", "+KEY_PHOTO_DIRECTORY+
+                " FROM " + TABLE_RECEIPT_DATA_SEARCH+" where "+KEY_RECEIPT_DATA+" LIKE '%"+query+"%'";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ShoppingReceiptData pic = new ShoppingReceiptData();
+                pic.setDate(cursor.getString(0));
+                pic.setReceiptData(cursor.getString(1));
+                pic.setAbsolutePath(cursor.getString(2));
+                values.add(pic);
+            }while (cursor.moveToNext());
+        }
+        return values;
+
+    }
 }

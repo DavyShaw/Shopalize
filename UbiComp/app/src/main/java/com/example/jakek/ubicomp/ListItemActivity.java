@@ -34,7 +34,7 @@ public class ListItemActivity extends AppCompatActivity {
 
         DBHandler db = new DBHandler(this);
         GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
+//        gridview.setAdapter(new ImageAdapter(this));
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,

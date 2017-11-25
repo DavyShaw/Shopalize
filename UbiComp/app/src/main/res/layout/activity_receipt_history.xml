@@ -34,9 +34,12 @@
         >
 
     <android.support.v7.widget.SearchView
-        android:layout_width="match_parent"
+        android:id="@+id/searchView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/lightGreen"/>
+        android:background="@color/lightGreen"
+        android:clickable="true"
+        android:onClick="expand"/>
 
     <!--<ListView-->
         <!--android:id="@+id/list_receipts"-->

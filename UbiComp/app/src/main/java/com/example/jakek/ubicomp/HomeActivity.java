@@ -59,6 +59,9 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.ShoppingList:
                 startActivity(new Intent(this, ShoppingList.class));
                 return true;
+            case R.id.StatsPage:
+                startActivity(new Intent(this, StatsActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

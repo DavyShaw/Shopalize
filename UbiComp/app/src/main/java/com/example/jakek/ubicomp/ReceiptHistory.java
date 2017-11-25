@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,14 +16,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +47,9 @@ import com.google.api.services.vision.v1.model.Image;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,7 +79,15 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
     private String absolutePath;
 
     private Uri uriPath;
+    Uri photoUri;
 
+    Bitmap bitmap;
+    File image;
+    ImageAdapter adapter;
+    GridView gridView;
+    SearchView searchView;
+    ArrayList<Uri> absPath;
+    List<ShoppingReceiptData> pics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,8 +148,6 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 //        lv.setAdapter(arrayAdapter);
 //        lv.setTextFilterEnabled(true);
 
-        GridView gridView = (GridView) findViewById(R.id.gridview);
-        gridView.setAdapter(new ImageAdapter(this));
 
 //        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            public void onItemClick(AdapterView<?> parent, View v,
@@ -155,6 +167,57 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 //            }
 //        }
 //        });
+
+        searchView=(SearchView) findViewById(R.id.searchView);
+        searchView.setQueryHint("Search View");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Intent intent = new Intent(getApplicationContext(), SearchResults.class);
+
+                intent.putExtra("query", query);
+
+                startActivity(intent);
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Toast.makeText(getBaseContext(), newText, Toast.LENGTH_LONG).show();
+
+                return false;
+            }
+        });
+
+
+    }
+
+    protected void onResume(){
+        super.onResume();
+        gridView = (GridView) findViewById(R.id.gridview);
+        pics = new ArrayList<>();
+        DBHandler db = new DBHandler(this);
+        try {
+            pics = db.getAllPics();
+        } catch (ParseException e) {
+            e.printStackTrace();
+
+        }
+        absPath = new ArrayList();
+
+        for (int i=0; i<pics.size(); i++){
+            String dir = pics.get(i).getAbsolutePath();
+            File f = new File(dir);
+            Uri imageUri = Uri.fromFile(f);
+
+            absPath.add(imageUri);
+        }
+        adapter = new ImageAdapter(this, absPath);
+        gridView.setAdapter(adapter);
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v,
@@ -163,12 +226,13 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 // Sending image id to FullScreenActivity
                 Intent i = new Intent(getApplicationContext(), FullImageActivity.class);
                 // passing array index
-                i.putExtra("id", position);
+                Log.i("HERE", absPath.get(position).toString());
+                i.putExtra("id", absPath.get(position).toString());
                 startActivity(i);
             }
         });
-    }
 
+    }
     // ---------------------------------------------------------------------------------------------
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -213,7 +277,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
     // ---------------------------------------------------------------------------------------------
 
-    private void startCamera() {
+    public void startCamera() {
         // verify the permissions. Request if not already granted
         if (PermissionUtils.requestPermission(
                 this,
@@ -222,7 +286,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 Manifest.permission.CAMERA,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // request launch of camera
-                    Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile()); // get the uri of the image
+                    photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile()); // get the uri of the image
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri); // assign the image to the uri, as an image cannot be retrieved from the getExtra() method
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // the camera will be allowed to read the uri in the data sent with the intent
                     startActivityForResult(intent, CAMERA_IMAGE_REQUEST); // open the activity and pass the result parameter
@@ -254,14 +318,59 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile());
 
             try {
-                createImageFile();
+//                createImageFile();
+                bitmap = scaleBitmapDown(
+                        MediaStore.Images.Media.getBitmap(getContentResolver(), photoUri),
+                        1200);
+                saveToSD(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            addPhotoToGallery();
             uploadImage(photoUri);
+//            adapter.updateAbsPath();
+//            adapter.addItem(image);
+//            adapter.notifyDataSetChanged();
+//            gridView.setAdapter(adapter);
+            DBHandler db = new DBHandler(this);
+            try {
+                pics = db.getAllPics();
+//                Toast.makeText(this, "here again", Toast.LENGTH_LONG).show();
+                int count = 0;
+                for (ShoppingReceiptData pic: pics){
+                    count++;
+                }
+                Toast.makeText(this, count+"", Toast.LENGTH_LONG).show();
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+
+            }
+            absPath = new ArrayList();
+
+            for (int i=0; i<pics.size(); i++){
+                String dir = pics.get(i).getAbsolutePath();
+                File f = new File(dir);
+                Uri imageUri = Uri.fromFile(f);
+
+                absPath.add(imageUri);
+            }
+            adapter = new ImageAdapter(this, absPath);
+            gridView.setAdapter(adapter);
+
+//            Toast.makeText(this, "Should appear", Toast.LENGTH_LONG).show();
+
+//            setContentView(R.layout.activity_receipt_history);
+
         }
+
+//        Intent intent = getIntent();
+//        finish();
+//        startActivity(intent);
+//        recreate();
+//        Toast.makeText(this, "RESTARTED", Toast.LENGTH_LONG).show();
+//        Log.i("RETRADTER", "Restartedddd");
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -290,9 +399,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             try {
 //                getRealPathFromURI(uri);
                 // scale the image to save on bandwidth
-                Bitmap bitmap = scaleBitmapDown(
-                        MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
-                        1200);
+
 
                 MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null , null);
 
@@ -474,7 +581,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         DBHandler db = new DBHandler(this);
 
 
-        db.addReceiptData(new ShoppingReceiptData(receiptOutput, absolutePath));
+        db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath()));
 
         db.close();
 
@@ -497,47 +604,81 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
     // ---------------------------------------------------------------------------------------------
 
-    private void addPhotoToGallery() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(absolutePath);
-        Uri contentUri = Uri.fromFile(f);
-
-
-        uriPath = contentUri;
-
-        String path = contentUri.toString();
-
-        Context context = getApplicationContext();
-//        Toast.makeText(context, path, Toast.LENGTH_LONG).show();
-
-//        getRealPathFromURI(contentUri);
-
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
+//    private void addPhotoToGallery() {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+////        File f = new File(absolutePath);
+//        Uri contentUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID+".provider", image);
+//
+//
+//        uriPath = contentUri;
+//
+//        String path = contentUri.toString();
+//
+////        Context context = getApplicationContext();
+////        Toast.makeText(context, absolutePath, Toast.LENGTH_LONG).show();
+//
+////        getRealPathFromURI(contentUri);
+//
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
+////        MediaScannerConnection.scanFile(this,  new String[]{image.getAbsolutePath()},
+////                null, new MediaScannerConnection.OnScanCompletedListener() {
+////            @Override
+////            public void onScanCompleted(String path, Uri uri) {
+////                Context context = getApplicationContext();
+////                Toast.makeText(context, path +"  " + uri, Toast.LENGTH_LONG).show();
+////                Log.v("grokkingandroid",
+////                        "file " + path + " was scanned seccessfully: " + uri);
+////            }
+////        });
+//        Toast.makeText(this, contentUri.toString(), Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, contentUri.toString(), Toast.LENGTH_LONG).show();
+//
+//    }
 
     // ---------------------------------------------------------------------------------------------
 
-    private void createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-
-
-        absolutePath = getFilesDir().getAbsolutePath();
-
-
-        Context context = getApplicationContext();
-        Toast.makeText(context, uriPath + imageFileName, Toast.LENGTH_LONG).show();
-
-    }
+//    private void createImageFile() throws IOException {
+//        File direct = new File(Environment.getExternalStorageDirectory() + "/myDir");
+//        if (!direct.exists()) {
+//            File wallpaperDirectory = new File(Environment.getExternalStorageDirectory()+"/myDir/");
+//            wallpaperDirectory.mkdirs();
+//        }
+//        // Create an image file name
+////        File mydir = this.getDir("mydir", Context.MODE_PRIVATE);
+////        if (!mydir.exists())
+////            mydir.mkdirs();
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        String imageFileName = "JPEG_" + timeStamp + "_.jpg";
+//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+////        File image = new File(storageDir, imageFileName+".jpg");
+////        imagePath = new File(Environment.getExternalStoragePublicDirectory(
+////                Environment.DIRECTORY_PICTURES), "Tuxuri");
+////        image = new File(new File(Environment.getExternalStorageDirectory() +"/myDir/"), photoUri);
+////        if (image.exists()) {
+////            image.delete();
+////        }
+////        image = new File(storageDir, imageFileName+ ".jpg");
+////        image = File.createTempFile(
+////                imageFileName,  /* prefix */
+////                ".jpg",         /* suffix */
+////                storageDir      /* directory */
+////        );
+//
+//
+//
+////        absolutePath = image.getAbsolutePath();
+//
+//        try {
+//            FileOutputStream out = new FileOutputStream(image);
+////            uriPath.compress(Bitmap.CompressFormat.JPEG, 100, out);
+//            out.flush();
+//            out.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     public void getRealPathFromURI(Uri uri) {
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
@@ -546,9 +687,57 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
         String path =  cursor.getString(idx);
 
         Context context = getApplicationContext();
-        Toast.makeText(context, path, Toast.LENGTH_LONG).show();
+//        Toast.makeText(context, path, Toast.LENGTH_LONG).show();
     }
 
 
+    public void saveToSD(Bitmap outputImage){
 
+
+        File storagePath = new File(Environment.getExternalStorageDirectory() + "/MyPhotos/");
+        if (!storagePath.exists())
+            storagePath.mkdirs();
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp;
+
+        image = new File(storagePath, imageFileName + ".jpg");
+
+        try {
+            FileOutputStream out = new FileOutputStream(image);
+            outputImage.compress(Bitmap.CompressFormat.JPEG, 80, out);
+            out.flush();
+            out.close();
+//            adapter = new ImageAdapter(this);
+//            gridView.setAdapter(adapter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Uri contentUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID+".provider", image);
+
+        uriPath = contentUri;
+
+
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+
+        MediaScannerConnection.scanFile(this,  new String[]{image.getAbsolutePath()},
+                null, new MediaScannerConnection.OnScanCompletedListener() {
+            @Override
+            public void onScanCompleted(String path, Uri uri) {
+            Log.v("grokkingandroid",
+                        "file " + path + " was scanned seccessfully: " + uri);
+            }
+        });
+    }
+
+
+    public void expand(View view) {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) searchView.getLayoutParams();
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        searchView.setLayoutParams(params);
+
+    }
 }

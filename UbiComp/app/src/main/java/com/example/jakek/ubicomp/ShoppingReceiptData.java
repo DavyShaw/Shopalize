@@ -32,6 +32,9 @@ public class ShoppingReceiptData {
     public void setDate(){
         this.date = new SimpleDateFormat(" HH:mm dd/MM/yyyy").format(new Date());
     }
+    public void setDate(String date){
+        this.date = date;
+    }
 
     public String getReceiptData(){
         return this.receiptData;

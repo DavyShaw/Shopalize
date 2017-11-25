@@ -19,5 +19,6 @@
 
     <string name="album_name">Shopalize</string>
     <string name="title_activity_full_image">fullImage</string>
+    <string name="title_activity_search_results">SearchResults</string>
 
 </resources>

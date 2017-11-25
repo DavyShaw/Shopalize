@@ -29,8 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ReceiptHistory" />
-        <activity android:name=".ShoppingList" />
+        <activity android:name=".ReceiptHistory"
+            android:parentActivityName=".HomeActivity"/>
+        <activity android:name=".ShoppingList"
+            android:parentActivityName=".HomeActivity"
+            />
         <activity
             android:name=".ListItemActivity"
             android:label="@string/title_activity_list_item"
@@ -56,13 +59,20 @@
             android:label="StatsActivity"
             android:parentActivityName=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".FullImageActivity"
             android:label="@string/title_activity_full_image"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".Gallery"></activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Gallery" />
+        <activity
+            android:name=".SearchResults"
+            android:label="@string/title_activity_search_results"
+            android:parentActivityName=".ReceiptHistory"
+            >
+        <intent-filter>
+            <action android:name="android.intent.action.SEARCH" />
+        </intent-filter>
+    </activity>
     </application>
 
 </manifest>
