@@ -17,7 +17,7 @@ import java.util.List;
 public class DBHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
     // Database Name
     private static final String DATABASE_NAME = "shopsInfo1";
     // Contacts table name
@@ -282,8 +282,8 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public ArrayList<String> popularity(){
-        String selectQuery = "SELECT item_name, COUNT(item_name) FROM " + TABLE_SHOPS
-                + " GROUP by item_name ORDER BY COUNT(item_name) DESC";
+        String selectQuery = "SELECT "+KEY_ITEM+", COUNT("+KEY_ITEM+") FROM " + TABLE_RECEIPT_DATA_ITEMS
+                + " GROUP by "+KEY_ITEM+" ORDER BY COUNT("+KEY_ITEM+") DESC";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 

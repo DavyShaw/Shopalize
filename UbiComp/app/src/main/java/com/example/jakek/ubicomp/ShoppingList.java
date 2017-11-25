@@ -458,9 +458,6 @@ public class ShoppingList extends AppCompatActivity {
                 prediction = values.get(i);
         }
 
-//        for (String value: values){
-//            Log.i("OVERHERE", value);
-//        }
         suggest.setText(prediction);
     }
 

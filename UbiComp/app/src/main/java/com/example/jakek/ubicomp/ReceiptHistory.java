@@ -329,7 +329,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
             uploadImage(photoUri);
 
-            
+
 //            adapter.updateAbsPath();
 //            adapter.addItem(image);
 //            adapter.notifyDataSetChanged();
@@ -392,24 +392,6 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
             Toast.makeText(this, R.string.image_picker_error, Toast.LENGTH_LONG).show();
         }
 
-        DBHandler db = new DBHandler(this);
-        try {
-            pics = db.getAllPics();
-        } catch (ParseException e) {
-            e.printStackTrace();
-
-        }
-        absPath = new ArrayList();
-
-        for (int i=0; i<pics.size(); i++){
-            String dir = pics.get(i).getAbsolutePath();
-            File f = new File(dir);
-            Uri imageUri = Uri.fromFile(f);
-
-            absPath.add(imageUri);
-        }
-        adapter = new ImageAdapter(this, absPath);
-        gridView.setAdapter(adapter);
 
     }
 
@@ -584,6 +566,26 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 public void run() {
 
                     Toast.makeText(getApplicationContext(), image.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                    DBHandler db = new DBHandler(getApplicationContext());
+                    try {
+                        pics = db.getAllPics();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+
+                    }
+                    absPath = new ArrayList();
+
+                    for (int i=0; i<pics.size(); i++){
+                        String dir = pics.get(i).getAbsolutePath();
+                        File f = new File(dir);
+                        Uri imageUri = Uri.fromFile(f);
+
+                        absPath.add(imageUri);
+                    }
+                    adapter = new ImageAdapter(getApplicationContext(), absPath);
+                    gridView.setAdapter(adapter);
+
+
                 }
             });
 
