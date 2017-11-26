@@ -268,7 +268,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // ---------------------------------------------------------------------------------------------
     public int spendByMonth(String date) {
-        String selectQuery = "SELECT item_price FROM " + TABLE_SHOPS
+        String selectQuery = "SELECT "+KEY_RECEIPT_DATA_TOTAL+" FROM " + TABLE_RECEIPT_DATA_SEARCH
                 + " WHERE date LIKE '%" + date + "'";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

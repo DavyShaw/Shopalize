@@ -26,6 +26,12 @@ public class ShoppingReceiptData {
         this.receiptTotal = receiptTotal;
     }
 
+    public ShoppingReceiptData(String receiptData, String absolutePath, double receiptTotal, String date){
+        this.date = date;
+        this.receiptData = receiptData;
+        this.absolutePath = absolutePath;
+        this.receiptTotal = receiptTotal;
+    }
 
     public String getDate(){
         return this.date;
