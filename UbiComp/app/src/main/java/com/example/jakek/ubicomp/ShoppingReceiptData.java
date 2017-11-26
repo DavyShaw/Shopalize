@@ -11,6 +11,7 @@ public class ShoppingReceiptData {
     private String date;
     private String receiptData;
     private String absolutePath;
+    private double receiptTotal;
 
 
     public ShoppingReceiptData(){
@@ -18,10 +19,11 @@ public class ShoppingReceiptData {
     }
 
 
-    public ShoppingReceiptData(String receiptData, String absolutePath){
+    public ShoppingReceiptData(String receiptData, String absolutePath, double receiptTotal){
         this.date = new SimpleDateFormat(" HH:mm dd/MM/yyyy").format(new Date());
         this.receiptData = receiptData;
         this.absolutePath = absolutePath;
+        this.receiptTotal = receiptTotal;
     }
 
 
@@ -50,6 +52,14 @@ public class ShoppingReceiptData {
 
     public void setAbsolutePath(String absolutePath){
         this.absolutePath = absolutePath;
+    }
+
+    public void setReceiptTotal(double receiptTotal){
+        this.receiptTotal = receiptTotal;
+    }
+
+    public double getReceiptTotal(){
+        return this.receiptTotal;
     }
 
 
