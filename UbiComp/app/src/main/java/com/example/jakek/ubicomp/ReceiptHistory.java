@@ -55,6 +55,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private boolean zoomOut =  false;
@@ -558,12 +561,46 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
     private void extractOneStringFromReceipt(String receiptOutput) {
         DBHandler db = new DBHandler(this);
 
+        int start = 0, end = 0;
 
-        db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath()));
+
+
+        String total = "total";
+        Pattern word = Pattern.compile(total);
+        Matcher match = word.matcher(receiptOutput);
+
+        while (match.find()) {
+            start = match.start();
+            end = (match.end()-1);
+        }
+
+        String extractedTotal = "";
+
+
+        if(start != 0 && end != 0) {
+
+            for (int i = end + 1; i < receiptOutput.length(); i++) {
+                char ch = receiptOutput.charAt(i);
+                int counter = 0;
+                if (((Character.isDigit(ch)) || (ch == '.') && counter <= 6)) {
+                    extractedTotal += receiptOutput.charAt(i);
+                    counter +=1;
+                }
+            }
+        }
+
+        if(extractedTotal.length()==0){
+            extractedTotal = "10.99";
+        }
+
+        double receiptTotal = Double.parseDouble(extractedTotal);
+
+        db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath(), receiptTotal));
 
         runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
 
                     Toast.makeText(getApplicationContext(), image.getAbsolutePath(), Toast.LENGTH_LONG).show();
                     DBHandler db = new DBHandler(getApplicationContext());
@@ -598,12 +635,38 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
     // ---------------------------------------------------------------------------------------------
 
     private void extractItemsFromReceipt(String receiptOutput) {
+        String unwantedItems [] = {"TESCO", "TOTAL", "CHANGE", "CASH"};
+
+        boolean isDigit = false;
+
         String items[] = receiptOutput.split("\\r?\\n");
 
         DBHandler db = new DBHandler(this);
 
         for (int i = 0; i < (items.length - 1); i += 1) {
-            db.addItemsFromReceipt(new ShoppingListItems(items[i]));
+            isDigit = false;
+
+            for (int k = 0; k<unwantedItems.length; k++){
+                if (items[i].contains(unwantedItems[k])){
+                    isDigit = true;
+                    break;
+                }
+            }
+
+
+            if(!isDigit) {
+                for (int j = 0; j < items[i].length(); j++) {
+                    if (Character.isDigit(items[i].charAt(j))) {
+                        isDigit = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!isDigit){
+                db.addItemsFromReceipt(new ShoppingListItems(items[i]));
+            }
+
         }
 
         db.close();
