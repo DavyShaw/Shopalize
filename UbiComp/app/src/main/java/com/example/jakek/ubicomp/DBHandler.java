@@ -40,6 +40,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String TABLE_RECEIPT_DATA_SEARCH = "receiptDataTable";
     private static final String KEY_PHOTO_DIRECTORY = "photoDirectory";
     private static final String KEY_RECEIPT_DATA = "receiptData";
+    private static final String KEY_RECEIPT_DATA_TOTAL = "receiptDataTotal";
 
 
     // Receipt data for predictions.
@@ -63,7 +64,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         String CREATE_RECEIPT_DATA_TABLE = "CREATE TABLE " + TABLE_RECEIPT_DATA_SEARCH + "("
                 + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_DATE + " TEXT," +
-                KEY_RECEIPT_DATA + " TEXT," + KEY_PHOTO_DIRECTORY + " TEXT)";
+                KEY_RECEIPT_DATA + " TEXT," + KEY_PHOTO_DIRECTORY + " TEXT," + KEY_RECEIPT_DATA_TOTAL + " DOUBLE)";
 
         db.execSQL(CREATE_RECEIPT_DATA_TABLE);
 
@@ -306,6 +307,7 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE, shoppingReceiptData.getDate());
         values.put(KEY_RECEIPT_DATA, shoppingReceiptData.getReceiptData());
         values.put(KEY_PHOTO_DIRECTORY, shoppingReceiptData.getAbsolutePath());
+        values.put(KEY_RECEIPT_DATA_TOTAL, shoppingReceiptData.getReceiptTotal());
 
 
         db.insert(TABLE_RECEIPT_DATA_SEARCH, null, values);
