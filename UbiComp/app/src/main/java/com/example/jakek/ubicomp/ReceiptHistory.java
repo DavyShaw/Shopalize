@@ -576,12 +576,12 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
         String extractedTotal = "";
 
+        int counter = 0;
 
         if(start != 0 && end != 0) {
 
             for (int i = end + 1; i < receiptOutput.length(); i++) {
                 char ch = receiptOutput.charAt(i);
-                int counter = 0;
                 if (((Character.isDigit(ch)) || (ch == '.') && counter <= 6)) {
                     extractedTotal += receiptOutput.charAt(i);
                     counter +=1;
