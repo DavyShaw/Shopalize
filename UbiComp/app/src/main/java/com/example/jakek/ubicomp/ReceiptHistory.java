@@ -584,8 +584,9 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
                 char ch = receiptOutput.charAt(i);
                 if (((Character.isDigit(ch)) || (ch == '.') && counter <= 6)) {
                     extractedTotal += receiptOutput.charAt(i);
-                    counter +=1;
+
                 }
+                counter +=1;
             }
         }
 
@@ -595,7 +596,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
         double receiptTotal = Double.parseDouble(extractedTotal);
 
-        db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath(), receiptTotal, "08/2017"));
+        db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath(), receiptTotal, "10/2017"));
 
         runOnUiThread(new Runnable() {
                 @Override

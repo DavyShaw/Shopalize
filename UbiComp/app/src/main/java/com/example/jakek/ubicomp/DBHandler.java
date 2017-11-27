@@ -283,7 +283,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public double spendAverage(){
-        String selectQuery = "SELECT " + KEY_RECEIPT_DATA_TOTAL + " FROM " + TABLE_RECEIPT_DATA_SEARCH;
+        String selectQuery = "SELECT " + KEY_RECEIPT_DATA_TOTAL + " FROM " + TABLE_RECEIPT_DATA_SEARCH + " GROUP BY DATE";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor1 = db.rawQuery(selectQuery, null);
 
