@@ -267,19 +267,35 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     // ---------------------------------------------------------------------------------------------
-    public int spendByMonth(String date) {
+    public double spendByMonth(String date) {
         String selectQuery = "SELECT "+KEY_RECEIPT_DATA_TOTAL+" FROM " + TABLE_RECEIPT_DATA_SEARCH
                 + " WHERE date LIKE '%" + date + "'";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        int total = 0;
+        double total = 0;
         if (cursor.moveToFirst()) {
             do {
                 total += cursor.getInt(0);
             } while (cursor.moveToNext());
         }
         return total;
+    }
+
+    public double spendAverage(){
+        String selectQuery = "SELECT " + KEY_RECEIPT_DATA_TOTAL + " FROM " + TABLE_RECEIPT_DATA_SEARCH;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor1 = db.rawQuery(selectQuery, null);
+
+        int counter = 0;
+        double total1 = 0;
+        if (cursor1.moveToFirst()) {
+            do {
+                total1 += cursor1.getInt(0);
+                counter +=1;
+            } while (cursor1.moveToNext());
+        }
+        return total1/counter;
     }
 
     public ArrayList<String> popularity(){
@@ -338,15 +354,15 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-                if (cursor.moveToFirst()) {
-                    do {
-                        ShoppingReceiptData pic = new ShoppingReceiptData();
-                        pic.setDate(cursor.getString(0));
-                        pic.setReceiptData(cursor.getString(1));
-                        pic.setAbsolutePath(cursor.getString(2));
-                        values.add(pic);
-                    }while (cursor.moveToNext());
-                }
+        if (cursor.moveToFirst()) {
+            do {
+                ShoppingReceiptData pic = new ShoppingReceiptData();
+                pic.setDate(cursor.getString(0));
+                pic.setReceiptData(cursor.getString(1));
+                pic.setAbsolutePath(cursor.getString(2));
+                values.add(pic);
+            }while (cursor.moveToNext());
+        }
         return values;
     }
 
