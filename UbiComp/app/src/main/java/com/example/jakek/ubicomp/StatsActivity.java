@@ -79,7 +79,7 @@ public class StatsActivity extends AppCompatActivity {
         DataPoint[] allPoints = new DataPoint[6];
 
         for (int i = 0; i< 6; i++) {
-            int x = db.spendByMonth(month + "/" + year);
+            double x = db.spendByMonth(month + "/" + year);
             allPoints[i] = new DataPoint(i, x);
             month = month+1;
 

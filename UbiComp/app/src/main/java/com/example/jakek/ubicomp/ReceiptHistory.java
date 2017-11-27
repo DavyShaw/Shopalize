@@ -595,7 +595,7 @@ public class ReceiptHistory extends AppCompatActivity implements AdapterView.OnI
 
         double receiptTotal = Double.parseDouble(extractedTotal);
 
-        db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath(), receiptTotal));
+        db.addReceiptData(new ShoppingReceiptData(receiptOutput, image.getAbsolutePath(), receiptTotal, "08/2017"));
 
         runOnUiThread(new Runnable() {
                 @Override
