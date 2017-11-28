@@ -282,21 +282,29 @@ public class DBHandler extends SQLiteOpenHelper {
         return total;
     }
 
+    // ---------------------------------------------------------------------------------------------
+
     public double spendAverage(){
-        String selectQuery = "SELECT " + KEY_RECEIPT_DATA_TOTAL + " FROM " + TABLE_RECEIPT_DATA_SEARCH + " GROUP BY DATE";
+        String selectQuery = "SELECT AVG(x.subtotal) " +
+                "FROM " +
+                "(" +
+                "SELECT sum(" + KEY_RECEIPT_DATA_TOTAL + ")subtotal " +
+                "FROM " + TABLE_RECEIPT_DATA_SEARCH +
+                " GROUP BY strftime('%Y-%m',date)" +
+                ") x";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor1 = db.rawQuery(selectQuery, null);
 
-        int counter = 0;
         double total1 = 0;
         if (cursor1.moveToFirst()) {
             do {
                 total1 += cursor1.getInt(0);
-                counter +=1;
             } while (cursor1.moveToNext());
         }
-        return total1/counter;
+        return total1;
     }
+
+    // ---------------------------------------------------------------------------------------------
 
     public ArrayList<String> popularity(){
         String selectQuery = "SELECT "+KEY_ITEM+", COUNT("+KEY_ITEM+") FROM " + TABLE_RECEIPT_DATA_ITEMS
