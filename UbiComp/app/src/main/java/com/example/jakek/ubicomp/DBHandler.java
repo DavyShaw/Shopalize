@@ -267,6 +267,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     // ---------------------------------------------------------------------------------------------
+
     public double spendByMonth(String date) {
         String selectQuery = "SELECT "+KEY_RECEIPT_DATA_TOTAL+" FROM " + TABLE_RECEIPT_DATA_SEARCH
                 + " WHERE date LIKE '%" + date + "'";
@@ -284,24 +285,42 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // ---------------------------------------------------------------------------------------------
 
-    public double spendAverage(){
-        String selectQuery = "SELECT AVG(x.subtotal) " +
-                "FROM " +
-                "(" +
-                "SELECT sum(" + KEY_RECEIPT_DATA_TOTAL + ")subtotal " +
-                "FROM " + TABLE_RECEIPT_DATA_SEARCH +
-                " GROUP BY strftime('%Y-%m',date)" +
-                ") x";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor1 = db.rawQuery(selectQuery, null);
 
-        double total1 = 0;
-        if (cursor1.moveToFirst()) {
-            do {
-                total1 += cursor1.getInt(0);
-            } while (cursor1.moveToNext());
+    public double currentSpend(String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(" + (KEY_RECEIPT_DATA_TOTAL) + ") FROM " + TABLE_RECEIPT_DATA_SEARCH + " WHERE " + KEY_DATE + " = '" + date + "'", null);
+
+        double total = 0;
+        if(cursor.moveToFirst()) {
+            total =  cursor.getDouble(0);
         }
-        return total1;
+
+        cursor.close();
+        return total;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    public double spendAverage(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        double months = 1;
+        double total = 0;
+
+        Cursor sum = db.rawQuery("SELECT SUM(" + (KEY_RECEIPT_DATA_TOTAL) + ") FROM " + TABLE_RECEIPT_DATA_SEARCH, null);
+        if(sum.moveToFirst()) {
+            total =  sum.getDouble(0);
+        }
+
+
+        Cursor numberMonths = db.rawQuery("SELECT COUNT(DISTINCT " + (KEY_DATE) + ") FROM " + TABLE_RECEIPT_DATA_SEARCH, null);
+        if(numberMonths.moveToFirst()) {
+            months =  numberMonths.getDouble(0);
+        }
+
+        sum.close();
+        numberMonths.close();
+        return total/months;
     }
 
     // ---------------------------------------------------------------------------------------------
