@@ -71,19 +71,19 @@ public class HomeActivity extends AppCompatActivity {
 
         double a = db.spendAverage();
         double l = db.spendByMonth(month + "/" + year);
-        Toast.makeText(this, a+"", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Average: " + a, Toast.LENGTH_LONG).show();
         //Test numbers
 //        int a = 400;
 //        int l = 400;
 
-        if (a > l){
-            getWindow().getDecorView().setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+        if (l < a){
+            getWindow().getDecorView().setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
         }
         if (a == l){
             getWindow().getDecorView().setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
         }
-        if (a < l){
-            getWindow().getDecorView().setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+        if (l > a){
+            getWindow().getDecorView().setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
         }
     }
 }
