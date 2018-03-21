@@ -6,10 +6,9 @@ This project was completed as part of a team consisting of myself, Jake Kavanagh
 
 As part of the project the following was undertaken:
 
-- Setting up of a Python web scraper that parsed JSON data and added it to an AWS RDS MySQL instance
-- Development and hosting of Python Flask application via AWS EC2 instance
-- Use of DublinBikes and OpenWeatherMaps APIs
-- Use of AWS S3 for backup storage
+- Developed a list application that allows users to store items
+- Intergrated Google Cloud Vision API for text analysis
+- Stored receipts locally using SQLite
 
 ## Application Screenshots
 Main Screen on Login - Colour of screen changes based upon the users current monthly spend compared to their average monthly spend.
