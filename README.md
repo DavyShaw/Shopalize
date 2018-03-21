@@ -1,5 +1,5 @@
 # Shopalize
-##Android Receipt Storage Application
+## Android Receipt Storage Application
 
 This project was undertaken as part of a Ubiquitous Computing module under Dr. Gregory O'Hare.
 This project was completed as part of a team consisting of myself, Jake Kavanagh and Thomas Neville.
