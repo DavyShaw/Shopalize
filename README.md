@@ -20,5 +20,6 @@ Shopping List - Contains entries that the user has added. The bottom button allo
 <img src="./Shopping List.PNG"/>
 
 Image Gallery - This allows the user to take photos of their receipts. From here the user can see their stored receipts. 
+
 <img src="./Receipt Gallery.PNG"/>
 
