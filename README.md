@@ -13,11 +13,11 @@ As part of the project the following was undertaken:
 
 ## Application Screenshots
 Main Screen on Login - Colour of screen changes based upon the users current monthly spend compared to their average monthly spend.
-<img src="./Main Screen.png"/>
+<img src="./Main Screen.PNG"/>
 
 Shopping List - Contains entries that the user has added. The bottom button allows the user to items based upon the user's past purchases. The user can also add item by clicking the button in the bottom right. From here the user can add an item by text or take a photo of the item which adds the item to the list.
-<img src="./Shopping List.png"/>
+<img src="./Shopping List.PNG"/>
 
 Image Gallery - This allows the user to take photos of their receipts. From here the user can see their stored receipts. 
-<img src="./Receipt Gallery.png"/>
+<img src="./Receipt Gallery.PNG"/>
 
